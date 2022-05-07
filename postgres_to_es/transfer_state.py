@@ -34,6 +34,7 @@ class JsonFileStorage(BaseStorage):
             with open(self.file_path, 'w') as _:
                 return {}
 
+
 class State:
 
     def __init__(self, storage: BaseStorage):
