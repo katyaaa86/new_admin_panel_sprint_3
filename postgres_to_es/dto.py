@@ -1,7 +1,21 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, BaseSettings, Field
+
+
+class PostgresSettings(BaseSettings):
+    dbname: str = Field('movies_database', env='DB_NAME')
+    user: str = Field('app', env='DB_USER')
+    password: str = Field('123qwe', env='DB_PASSWORD')
+    host: str = Field('127.0.0.1', env='DB_HOST')
+    port: int = Field(5434, env='DB_PORT')
+
+
+class ElasticSettings(BaseSettings):
+    es_host: str = Field('http://127.0.0.1:9200', env='ES_HOST')
+    es_user: str = Field('', env='ES_USER')
+    es_password: str = Field('', env='ES_PASSWORD')
 
 
 class FilmworkData(BaseModel):

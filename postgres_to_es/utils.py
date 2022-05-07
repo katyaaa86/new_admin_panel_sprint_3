@@ -7,7 +7,7 @@ class TransferDataError(Exception):
     pass
 
 
-def backoff(start_sleep_time=0.1, factor=2, border_sleep_time=10):
+def backoff(start_sleep_time=0.1, factor=2, border_sleep_time=10, raise_error=TransferDataError):
     def func_wrapper(func):
         @wraps(func)
         def inner(*args, **kwargs):
@@ -26,7 +26,7 @@ def backoff(start_sleep_time=0.1, factor=2, border_sleep_time=10):
                     else:
                         sleep_time = sleep_time * 2 ** factor if sleep_time < border_sleep_time else border_sleep_time
             else:
-                raise TransferDataError
+                raise raise_error
             return result
         return inner
     return func_wrapper

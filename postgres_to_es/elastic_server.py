@@ -1,3 +1,5 @@
+import logging
+
 from elasticsearch import Elasticsearch, helpers
 
 from dto import ESFilmworkData, FilmworkData
@@ -14,7 +16,7 @@ class ElasticSaver:
         query = [{'_index': 'movies', '_id': data.id, '_source': data.dict()} for data in es_data]
         rows_count, errors = helpers.bulk(es, query)
         if errors:
-            print(errors)
+            logging.error('Send data to elastic errors', extra={'query': query, 'errors': errors})
         return rows_count, errors
 
 

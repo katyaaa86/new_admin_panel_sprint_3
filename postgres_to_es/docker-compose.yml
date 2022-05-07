@@ -1,0 +1,53 @@
+version: '3'
+services:
+  # сервисы из предыдущего спринта:
+  db:
+    image: postgres:13.0-alpine
+    volumes:
+      - ../../postgresql/data:/var/lib/postgresql/data/
+    env_file:
+      - ./deploy/envs/db.env
+    ports:
+      - "5434:5432"
+
+  app:
+    build:
+      dockerfile: Dockerfile
+      context: app
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - .:/usr/src/app/
+      - ./static:/usr/src/app/static
+    expose:
+      - 8000
+    env_file:
+      - ./deploy/envs/app.env
+    entrypoint: ./app/entrypoint.sh
+    depends_on:
+      - db
+
+  nginx:
+    build:
+      dockerfile: Dockerfile
+      context: nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./static:/static
+    ports:
+      - "1337:8000"
+    depends_on:
+      - app
+
+  elastic:
+    image: elasticsearch:7.17.0
+    ports:
+      - "9200:9200"
+    environment:
+      - "ES_JAVA_OPTS=-Xms200m -Xmx200m"
+      - discovery.type=single-node
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+
+volumes:
+  elasticsearch-data:
+    driver: local
